@@ -70,11 +70,15 @@
 
 <!-- STUDIO -->
 <section class="view" id="view-studio">
-  <div class="section-title"><h2>AI Creation Studio <em class="pro">PRO</em></h2><p>Turn your ideas into stunning videos. These tools write ready-to-use drafts; paste them into your video generator.</p></div>
+  <div class="section-title"><h2>AI Creation Studio <em class="pro">PRO</em></h2><p>7 free tools that really work — no credits needed. They write ready-to-use drafts; paste them into your video generator.</p></div>
   <div class="tabs">
     <button class="tab active" data-tool="prompt">Video Prompt</button>
     <button class="tab" data-tool="voice">Voiceover</button>
     <button class="tab" data-tool="plan">Content Plan</button>
+    <button class="tab" data-tool="title">Titles</button>
+    <button class="tab" data-tool="thumb">Thumbnail</button>
+    <button class="tab" data-tool="story">Story</button>
+    <button class="tab" data-tool="hash">Hashtags</button>
   </div>
 
   <div class="panel" id="promptTool">
@@ -108,6 +112,42 @@
     <button class="gold-btn wide" id="makePlan">Build plan ✦</button>
     <div class="output hidden" id="planOutput"><pre id="planResult"></pre><div class="out-actions"><button class="text-btn" data-copy="planResult">Copy</button></div></div>
   </div>
+
+  <div class="panel hidden" id="titleTool">
+    <label>Video topic</label>
+    <input id="titleTopic" placeholder="e.g. How I started my shop with Rs 10,000">
+    <div class="row">
+      <select id="titleStyle"><option>Curiosity</option><option>How-to</option><option>List</option><option>Story</option></select>
+      <select id="titleLang"><option>English</option><option>Roman Urdu</option><option>Urdu</option></select>
+    </div>
+    <button class="gold-btn wide" id="makeTitle">Make titles ✦</button>
+    <div class="output hidden" id="titleOutput"><pre id="titleResult"></pre><div class="out-actions"><button class="text-btn" data-copy="titleResult">Copy</button></div></div>
+  </div>
+
+  <div class="panel hidden" id="thumbTool">
+    <label>Video topic</label>
+    <input id="thumbTopic" placeholder="e.g. 5 money mistakes">
+    <button class="gold-btn wide" id="makeThumb">Make thumbnail ideas ✦</button>
+    <div class="output hidden" id="thumbOutput"><pre id="thumbResult"></pre><div class="out-actions"><button class="text-btn" data-copy="thumbResult">Copy</button></div></div>
+  </div>
+
+  <div class="panel hidden" id="storyTool">
+    <label>Main character</label>
+    <input id="storyChar" placeholder="e.g. A small shopkeeper named Usman">
+    <div class="row">
+      <select id="storyMoral"><option>Honesty</option><option>Hard work</option><option>Kindness</option><option>Saving money</option></select>
+      <select id="storyLen"><option>30 seconds</option><option>60 seconds</option></select>
+    </div>
+    <button class="gold-btn wide" id="makeStory">Write story ✦</button>
+    <div class="output hidden" id="storyOutput"><pre id="storyResult"></pre><div class="out-actions"><button class="text-btn" data-copy="storyResult">Copy</button></div></div>
+  </div>
+
+  <div class="panel hidden" id="hashTool">
+    <label>Post topic</label>
+    <input id="hashTopic" placeholder="e.g. Morning routine of successful people">
+    <button class="gold-btn wide" id="makeHash">Make caption + hashtags ✦</button>
+    <div class="output hidden" id="hashOutput"><pre id="hashResult"></pre><div class="out-actions"><button class="text-btn" data-copy="hashResult">Copy</button></div></div>
+  </div>
 </section>
 
 <!-- EXPLORE -->
@@ -129,7 +169,9 @@
       <div><b id="sDrafts">0</b><small>Saved drafts</small></div>
     </div>
     <button class="gold-btn" id="editProfile">Edit Profile</button>
-    <p class="bio">Create • Share • Grow • Earn<br>Dream Big… ✦</p>
+    <p class="bio" id="pbio">Create • Share • Grow • Earn<br>Dream Big… ✦</p>
+    <p class="muted" id="pniche"></p>
+    <p class="notice">Your profile is saved in this browser only. Real login with email and password comes in the next step.</p>
   </div>
   <div class="section-title"><h2>My Library</h2><p>Your saved prompts, scripts and plans.</p></div>
   <div id="library" class="library"></div>
@@ -155,7 +197,7 @@
 <section class="view" id="view-plans">
   <div class="section-title"><h2>Plans</h2><p>Planned membership tiers. Payments are not enabled yet.</p></div>
   <div class="plans">
-    <article class="plan"><h3>Free</h3><p class="price">$0</p><ul><li>Prompt, voiceover and plan tools</li><li>Local library</li><li>Community feed</li></ul><button class="ghost-btn wide" disabled>Current</button></article>
+    <article class="plan"><h3>Free</h3><p class="price">$0</p><ul><li>7 free tools: prompt, voiceover, plan, titles, thumbnails, stories, hashtags</li><li>Local library</li><li>Community feed</li></ul><button class="ghost-btn wide" disabled>Current</button></article>
     <article class="plan featured"><span class="badge">PRO</span><h3>Pro</h3><p class="price">Soon</p><ul><li>Higher generation limits</li><li>HD export</li><li>Creator analytics</li></ul><button class="gold-btn wide" id="waitPro">Join waitlist</button></article>
     <article class="plan"><span class="badge">♛</span><h3>Premium</h3><p class="price">Soon</p><ul><li>Everything in Pro</li><li>Priority queue</li><li>Monetization tools</li></ul><button class="ghost-btn wide" id="waitPrem">Join waitlist</button></article>
   </div>
@@ -175,6 +217,19 @@
   <h3>New post</h3>
   <textarea id="postText" maxlength="280" placeholder="Share an idea with the community…"></textarea>
   <div class="dialog-actions"><button class="ghost-btn" id="cancelPost">Cancel</button><button class="gold-btn" id="publishPost">Post</button></div>
+</dialog>
+<dialog id="profileDialog">
+  <h3>Create your account</h3>
+  <label>Display name</label>
+  <input id="pfName" maxlength="30" placeholder="e.g. Usman Khan">
+  <label>Username</label>
+  <input id="pfUser" maxlength="20" placeholder="e.g. usmancreates">
+  <label>Bio</label>
+  <textarea id="pfBio" maxlength="140" placeholder="Tell people what you create…"></textarea>
+  <label>Your niche</label>
+  <select id="pfNiche"><option>General</option><option>Finance &amp; Money</option><option>Kids &amp; Learning</option><option>Motivation</option><option>Comedy</option><option>Tech</option><option>Vlog</option></select>
+  <div class="dialog-actions"><button class="ghost-btn" id="cancelProfile">Cancel</button><button class="gold-btn" id="saveProfile">Save profile</button></div>
+  <p class="notice">Free account — saved in this browser only for now.</p>
 </dialog>
 <div id="toast"></div>
 <script src="app.js"></script>

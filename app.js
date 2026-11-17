@@ -1,9 +1,10 @@
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const KEY="createworld-ai-v2";
-const def={name:"Creator",saved:[],posts:[],likes:[],followers:0,views:0,original:false,guidelines:false};
+const def={name:"Creator",profile:null,hasProfile:false,saved:[],posts:[],likes:[],followers:0,views:0,original:false,guidelines:false};
 let state;
 try{state={...def,...JSON.parse(localStorage.getItem(KEY)||"{}")}}catch(e){state={...def}}
+if(!state.profile)state.profile={name:state.name||"Creator",username:(state.name||"creator").toLowerCase().replace(/[^a-z0-9]+/g,""),bio:"Create • Share • Grow • Earn",niche:"General"};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt=n=>Number(n||0).toLocaleString("en-US");
@@ -22,9 +23,10 @@ function go(v){
 document.addEventListener("click",e=>{const b=e.target.closest("[data-view]");if(b)go(b.dataset.view)});
 
 /* studio */
+const TOOLS=["prompt","voice","plan","title","thumb","story","hash"];
 $$(".tab[data-tool]").forEach(b=>b.onclick=()=>{
   $$(".tab[data-tool]").forEach(x=>x.classList.toggle("active",x===b));
-  ["prompt","voice","plan"].forEach(k=>$("#"+k+"Tool").classList.toggle("hidden",k!==b.dataset.tool));
+  TOOLS.forEach(k=>$("#"+k+"Tool").classList.toggle("hidden",k!==b.dataset.tool));
 });
 $("#idea").oninput=e=>$("#count").textContent=e.target.value.length;
 $$("#styleChips .chip").forEach(c=>c.onclick=()=>{$$("#styleChips .chip").forEach(x=>x.classList.toggle("active",x===c))});
@@ -94,6 +96,82 @@ BEFORE POSTING
   toast("Plan ready ✦");
 };
 
+$("#makeTitle").onclick=()=>{
+  const t=$("#titleTopic").value.trim(); if(!t)return toast("Enter a video topic first");
+  const style=$("#titleStyle").value, lang=$("#titleLang").value;
+  const T={
+    Curiosity:[`Nobody Told You This About ${t}`,`The Truth About ${t} (Watch Till The End)`,`Why Everyone Is Wrong About ${t}`,`${t} — The Secret Nobody Shares`,`I Tried ${t} For 7 Days… Shocking Result`],
+    "How-to":[`How To ${t} — Step By Step`,`${t} In 5 Easy Steps`,`Learn ${t} Fast — Beginner Guide`,`How I Do ${t} (Simple Method)`,`${t}: The Complete Guide For Beginners`],
+    List:[`5 Best Ways To ${t}`,`Top 7 ${t} Tips You Need Today`,`3 ${t} Mistakes To Avoid`,`10 ${t} Ideas That Actually Work`,`${t}: 5 Things I Wish I Knew Earlier`],
+    Story:[`My ${t} Story — From Zero To…`,`How ${t} Changed My Life`,`The Day ${t} Taught Me Everything`,`My Honest ${t} Journey`,`${t} — What Happened Next Will Surprise You`]
+  }[style];
+  show("#titleOutput","#titleResult",
+`TITLES · ${style.toUpperCase()} · ${lang.toUpperCase()}
+
+${T.map((x,i)=>(i+1)+". "+x).join("\n")}
+
+DESCRIPTION
+In this video: ${t}. Watch till the end for the best tip. Like, share and follow for more!
+
+TAGS
+${t.toLowerCase().replace(/[^a-z0-9 ]/g,"").split(/\s+/).filter(Boolean).slice(0,5).map(w=>"#"+w).join(" ")} #createworldai #shorts #viral`,"Titles + description");
+  toast("Titles ready ✦");
+};
+$("#makeThumb").onclick=()=>{
+  const t=$("#thumbTopic").value.trim(); if(!t)return toast("Enter a video topic first");
+  show("#thumbOutput","#thumbResult",
+`THUMBNAIL IDEAS: ${t}
+
+1. BIG BOLD TEXT
+Text: "${t.toUpperCase().slice(0,24)}"
+Style: yellow text on dark background, shocked face on the right.
+
+2. BEFORE vs AFTER
+Left: sad / messy. Right: happy / clean.
+Text: "BEFORE → AFTER" in white + gold arrow.
+
+3. ONE WORD + EMOTION
+Text: "WOW!" or "SECRET!"
+Style: close-up face, bright background, red circle around the key thing.
+
+RULES
+• Max 3–4 words on the thumbnail
+• Big text, high contrast (yellow/white on dark)
+• One clear face or object — no clutter`,"Thumbnail ideas");
+  toast("Thumbnail ideas ready ✦");
+};
+$("#makeStory").onclick=()=>{
+  const c=$("#storyChar").value.trim(); if(!c)return toast("Enter a main character first");
+  const moral=$("#storyMoral").value,len=$("#storyLen").value;
+  show("#storyOutput","#storyResult",
+`CARTOON STORY · ${len.toUpperCase()} · MORAL: ${moral.toUpperCase()}
+
+${c} lived a simple life. One day, a small problem came — and everyone said it could not be fixed.
+
+But ${c} did not give up. With patience and a clever idea, the problem slowly turned into a chance.
+
+In the end, everyone smiled — because the real treasure was ${moral.toLowerCase()}.
+
+LESSON
+${moral} always wins in the end.
+
+(Use this story with your cartoon scenes. Keep each scene 5–8 seconds.)`,"Cartoon story");
+  toast("Story ready ✦");
+};
+$("#makeHash").onclick=()=>{
+  const t=$("#hashTopic").value.trim(); if(!t)return toast("Enter a post topic first");
+  const words=t.toLowerCase().replace(/[^a-z0-9 ]/g,"").split(/\s+/).filter(Boolean);
+  const tags=[...new Set([...words.slice(0,4),"createworldai","viral","trending","reels","shorts","foryou","creator","motivation"])].slice(0,10).map(w=>"#"+w).join(" ");
+  show("#hashOutput","#hashResult",
+`CAPTION
+${t} ✨
+Create • Share • Grow • Earn — only on CreateWorld AI.
+
+HASHTAGS
+${tags}`,"Caption + hashtags");
+  toast("Caption ready ✦");
+};
+
 /* feed */
 const samples=[
   {id:"s1",name:"Creative Vision",time:"Featured idea",text:"A powerful story can start with one simple frame. What are you creating this week?",ico:"✦",tab:"trending"},
@@ -118,12 +196,32 @@ $("#publishPost").onclick=()=>{const t=$("#postText").value.trim();if(!t)return 
 
 /* profile */
 function renderProfile(){
-  const n=state.name||"Creator";
+  const p=state.profile||{name:"Creator",username:"creator",bio:"",niche:"General"};
+  const n=p.name||"Creator";
   $("#pname").textContent=n;$("#pfp").textContent=n[0].toUpperCase();$("#avatarBtn").textContent=n[0].toUpperCase();
-  $("#phandle").textContent="@"+n.toLowerCase().replace(/[^a-z0-9]+/g,"");
+  $("#phandle").textContent="@"+(p.username||"creator");
+  $("#pbio").textContent=p.bio||"Create • Share • Grow • Earn";
+  $("#pniche").textContent=p.niche?("Niche: "+p.niche):"";
+  $("#editProfile").textContent=state.hasProfile?"Edit Profile":"Create Account";
   $("#sViews").textContent=fmt(state.views);$("#sFollowers").textContent=fmt(state.followers);$("#sDrafts").textContent=state.saved.length;
 }
-$("#editProfile").onclick=()=>{const n=prompt("Display name:",state.name);if(n&&n.trim()){state.name=n.trim().slice(0,30);save();renderProfile();toast("Name updated")}};
+$("#editProfile").onclick=()=>{
+  const p=state.profile||{name:"",username:"",bio:"",niche:"General"};
+  $("#profileDialog h3").textContent=state.hasProfile?"Edit profile":"Create your account";
+  $("#pfName").value=p.name==="Creator"?"":p.name;
+  $("#pfUser").value=p.username==="creator"?"":p.username;
+  $("#pfBio").value=p.bio||"";
+  $("#pfNiche").value=p.niche||"General";
+  $("#profileDialog").showModal();
+};
+$("#cancelProfile").onclick=()=>$("#profileDialog").close();
+$("#saveProfile").onclick=()=>{
+  const n=$("#pfName").value.trim(),u=$("#pfUser").value.trim().toLowerCase().replace(/[^a-z0-9_]/g,"");
+  if(!n)return toast("Enter your display name");
+  if(!u)return toast("Choose a username (letters and numbers)");
+  state.profile={name:n.slice(0,30),username:u.slice(0,20),bio:$("#pfBio").value.trim().slice(0,140),niche:$("#pfNiche").value};
+  state.name=n.slice(0,30);state.hasProfile=true;save();$("#profileDialog").close();renderProfile();toast("Account created ✦ Welcome, "+n);
+};
 function renderLibrary(){
   const el=$("#library");
   if(!state.saved.length){el.innerHTML=`<div class="empty">Your generated prompts, scripts and plans are saved here automatically.</div>`;return}
