@@ -22,7 +22,10 @@
     <button data-view="creator">Creator</button>
     <button data-view="monetize">Monetization</button>
     <button data-view="plans">Plans</button>
+    <button data-view="inbox">Inbox</button>
+    <button data-view="settings">Settings</button>
   </nav>
+  <button class="icon-btn" data-view="inbox" aria-label="Inbox">✉</button>
   <button class="avatar" data-view="creator" id="avatarBtn" aria-label="Profile">U</button>
 </header>
 
@@ -152,7 +155,7 @@
 
 <!-- EXPLORE -->
 <section class="view" id="view-explore">
-  <div class="section-title row-title"><div><h2>Explore</h2><p>Trending ideas and your own posts (saved in this browser only).</p></div><button class="gold-btn" id="newPost">＋ New post</button></div>
+  <div class="section-title row-title"><div><h2>Explore</h2><p>Trending ideas and your own posts (saved in this browser only).</p></div><div><button class="ghost-btn" data-view="inbox">✉ Inbox</button> <button class="gold-btn" id="newPost">＋ New post</button></div></div>
   <div class="tabs"><button class="tab active" data-feed="foryou">For You</button><button class="tab" data-feed="following">Following</button><button class="tab" data-feed="trending">Trending</button></div>
   <div id="feed"></div>
 </section>
@@ -169,6 +172,7 @@
       <div><b id="sDrafts">0</b><small>Saved drafts</small></div>
     </div>
     <button class="gold-btn" id="editProfile">Edit Profile</button>
+    <button class="ghost-btn wide" data-view="settings">⚙ Settings</button>
     <p class="bio" id="pbio">Create • Share • Grow • Earn<br>Dream Big… ✦</p>
     <p class="muted" id="pniche"></p>
     <p class="muted" id="pquota"></p>
@@ -199,6 +203,16 @@
   </div>
   <div class="panel" id="reqList"></div>
   <div class="eligible" id="eligibleBox"></div>
+  <div class="panel" id="rewardsPanel">
+    <h3>♛ Creator Rewards Program</h3>
+    <p class="muted">Views se kamai — jaise TikTok Rewards. Demo rate: <b>Rs 50 per 10,000 views</b>.</p>
+    <label>Views this month</label>
+    <input type="number" min="0" id="rwViews" placeholder="e.g. 50000">
+    <p class="muted" id="rwResult">Estimated reward: Rs 0 (demo)</p>
+    <button class="gold-btn wide" id="joinRewards">Join Rewards Program</button>
+    <p class="muted" id="rwStatus"></p>
+    <p class="notice">Demo hisaab hai — asli payout ke liye backend, verified account aur payment provider chahiye.</p>
+  </div>
   <p class="notice">This checker only compares your numbers with the target requirements (1,000 followers, 50,000 views in 30 days). Real payouts need a backend, verified accounts and a payment provider, which are not part of this website yet.</p>
 </section>
 
@@ -209,6 +223,56 @@
     <article class="plan"><h3>Free</h3><p class="price">Rs 0</p><ul><li>7 free tools (no video cost)</li><li>1 trial Lite video / month</li><li>Local library</li><li>Community feed</li></ul><button class="ghost-btn wide" id="planFreeBtn">Current plan</button></article>
     <article class="plan featured"><span class="badge">PRO</span><h3>Pro</h3><p class="price">Rs 999<small>/mo</small></p><ul><li>6 Lite videos / month</li><li>All 7 free tools</li><li>HD export</li><li>Creator analytics</li></ul><button class="gold-btn wide" id="choosePro">Choose Pro</button></article>
     <article class="plan"><span class="badge">♛</span><h3>Premium</h3><p class="price">Rs 1,999<small>/mo</small></p><ul><li>14 Lite videos / month</li><li>Everything in Pro</li><li>Priority queue</li><li>Monetization tools</li></ul><button class="ghost-btn wide" id="choosePrem">Choose Premium</button></article>
+  </div>
+</section>
+
+<!-- SETTINGS -->
+<section class="view" id="view-settings">
+  <div class="section-title"><h2>⚙ Settings</h2><p>TikTok jaisi settings — sab kuch yahan se control karo.</p></div>
+  <div class="panel">
+    <h3>Account</h3>
+    <p class="muted" id="setAccount"></p>
+    <button class="gold-btn wide" id="setEditProfile">Edit Profile</button>
+    <button class="ghost-btn wide" data-view="plans">Change Plan</button>
+  </div>
+  <div class="panel">
+    <h3>Privacy</h3>
+    <label class="check"><input type="checkbox" id="setPublic"> Public profile (sab dekh sakte hain)</label>
+    <label class="check"><input type="checkbox" id="setComments"> Comments allow karo</label>
+    <label class="check"><input type="checkbox" id="setDownloads"> Downloads allow karo</label>
+    <label class="check"><input type="checkbox" id="setShowVideos"> Meri videos sab ko dikhao</label>
+  </div>
+  <div class="panel">
+    <h3>Notifications</h3>
+    <label class="check"><input type="checkbox" id="setNotifFollowers"> New followers</label>
+    <label class="check"><input type="checkbox" id="setNotifLikes"> Likes &amp; comments</label>
+    <label class="check"><input type="checkbox" id="setNotifRewards"> Rewards updates</label>
+    <label class="check"><input type="checkbox" id="setNotifMessages"> New messages</label>
+  </div>
+  <div class="panel">
+    <h3>Content &amp; Display</h3>
+    <label>Language</label>
+    <select id="setLang"><option>Roman Urdu</option><option>English</option><option>Urdu</option></select>
+    <label class="check"><input type="checkbox" id="setAutoplay"> Videos autoplay karo</label>
+  </div>
+  <div class="panel">
+    <h3>Data</h3>
+    <p class="muted" id="setStorage"></p>
+    <button class="ghost-btn wide" id="clearData">Clear my data</button>
+    <p class="notice">CreateWorld AI v2 (demo) — data sirf is browser mein save hota hai.</p>
+  </div>
+</section>
+
+<!-- INBOX -->
+<section class="view" id="view-inbox">
+  <div class="section-title"><h2>✉ Inbox</h2><p>Logon se chat karo — messages is browser mein save hote hain.</p></div>
+  <div id="inboxList"></div>
+  <div id="threadView" class="hidden">
+    <button class="ghost-btn" id="backInbox">← Back</button>
+    <h3 id="threadName"></h3>
+    <div id="threadMsgs"></div>
+    <div class="chat-row"><input id="threadInput" placeholder="Message likho…" maxlength="280"><button class="gold-btn" id="sendMsg">Send</button></div>
+    <p class="notice">Demo chat — asli messaging ke liye backend aur real accounts chahiye.</p>
   </div>
 </section>
 

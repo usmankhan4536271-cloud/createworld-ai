@@ -1,7 +1,7 @@
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const KEY="createworld-ai-v2";
-const def={name:"Creator",profile:null,hasProfile:false,plan:"free",videosUsed:0,earnings:0,saved:[],posts:[],likes:[],followers:0,views:0,original:false,guidelines:false};
+const def={name:"Creator",profile:null,hasProfile:false,plan:"free",videosUsed:0,earnings:0,saved:[],posts:[],likes:[],following:[],followers:0,views:0,original:false,guidelines:false,rewardsJoined:false,settings:{publicProfile:true,allowComments:true,allowDownloads:false,showVideos:true,notifFollowers:true,notifLikes:true,notifRewards:true,notifMessages:true,autoplay:true,lang:"Roman Urdu"},inbox:null};
 let state;
 try{state={...def,...JSON.parse(localStorage.getItem(KEY)||"{}")}}catch(e){state={...def}}
 if(!state.profile)state.profile={name:state.name||"Creator",username:(state.name||"creator").toLowerCase().replace(/[^a-z0-9]+/g,""),bio:"Create • Share • Grow • Earn",niche:"General"};
@@ -19,6 +19,8 @@ function go(v){
   if(v==="creator"){renderProfile();renderLibrary()}
   if(v==="monetize")renderMonetize();
   if(v==="explore")renderFeed();
+  if(v==="settings")renderSettings();
+  if(v==="inbox")renderInbox();
 }
 document.addEventListener("click",e=>{const b=e.target.closest("[data-view]");if(b)go(b.dataset.view)});
 
@@ -174,10 +176,10 @@ ${tags}`,"Caption + hashtags");
 
 /* feed */
 const samples=[
-  {id:"s1",name:"Creative Vision",time:"Featured idea",text:"A powerful story can start with one simple frame. What are you creating this week?",ico:"✦",tab:"trending"},
-  {id:"s2",name:"Story Lab",time:"Video concept",text:"Try a 15-second story: one character, one challenge, one surprising last moment.",ico:"⌁",tab:"foryou"},
-  {id:"s3",name:"Future Makers",time:"Inspiration",text:"Decide the feeling you want viewers to keep, then build every scene around it.",ico:"◈",tab:"foryou"},
-  {id:"s4",name:"Hook School",time:"Tip",text:"Your first two seconds decide everything. Start with the most interesting moment, not the intro.",ico:"♛",tab:"trending"}
+  {id:"s1",name:"Creative Vision",time:"Featured video",text:"A powerful story can start with one simple frame. What are you creating this week?",ico:"✦",tab:"trending",img:"img/poster.jpg",views:12400},
+  {id:"s2",name:"Story Lab",time:"Video concept",text:"Try a 15-second story: one character, one challenge, one surprising last moment.",ico:"⌁",tab:"foryou",img:"img/showcase.jpg",views:8300},
+  {id:"s3",name:"Future Makers",time:"Inspiration",text:"Decide the feeling you want viewers to keep, then build every scene around it.",ico:"◈",tab:"foryou",img:"img/poster.jpg",views:5600},
+  {id:"s4",name:"Hook School",time:"Tip",text:"Your first two seconds decide everything. Start with the most interesting moment, not the intro.",ico:"♛",tab:"trending",img:"img/showcase.jpg",views:21400}
 ];
 let feedTab="foryou";
 $$("[data-feed]").forEach(b=>b.onclick=()=>{feedTab=b.dataset.feed;$$("[data-feed]").forEach(x=>x.classList.toggle("active",x===b));renderFeed()});
@@ -185,10 +187,17 @@ function renderFeed(){
   const own=state.posts.map((p,i)=>({...p,id:"own"+i,ico:"U",time:"Your post",tab:"all"}));
   let list=[...own,...samples];
   if(feedTab==="trending")list=list.filter(p=>p.tab==="trending"||p.tab==="all");
-  if(feedTab==="following")list=own;
-  $("#feed").innerHTML=list.length?list.map(p=>`<article class="post"><div class="ico">${p.ico}</div><div><b>${esc(p.name)}</b><small>${esc(p.time)}</small><p>${esc(p.text)}</p><div class="acts"><button data-like="${p.id}" class="${state.likes.includes(p.id)?"on":""}">${state.likes.includes(p.id)?"♥ Liked":"♡ Like"}</button><button data-share="${p.id}">↗ Share</button></div></div></article>`).join(""):`<div class="empty">Nothing here yet. Tap “New post” to share your first idea.</div>`;
+  if(feedTab==="following")list=list.filter(p=>p.tab==="all"||(state.following||[]).includes(p.id));
+  $("#feed").innerHTML=list.length?list.map(p=>{
+    const followed=(state.following||[]).includes(p.id);
+    const thumb=p.img?`<div class="vthumb" data-play="${p.id}"><img src="${p.img}" alt=""><span class="play">▶</span><span class="vcount">${fmt(p.views||0)} views</span></div>`:"";
+    const follow=p.tab==="all"?"":`<button data-follow="${p.id}">${followed?"✓ Following":"＋ Follow"}</button>`;
+    return `<article class="post"><div class="ico">${p.ico}</div><div><b>${esc(p.name)}</b><small>${esc(p.time)}</small>${thumb}<p>${esc(p.text)}</p><div class="acts"><button data-like="${p.id}" class="${state.likes.includes(p.id)?"on":""}">${state.likes.includes(p.id)?"♥ Liked":"♡ Like"}</button><button data-share="${p.id}">↗ Share</button>${follow}</div></div></article>`;
+  }).join(""):`<div class="empty">Nothing here yet. Tap “New post” to share your first idea.</div>`;
   $$("[data-like]").forEach(b=>b.onclick=()=>{const id=b.dataset.like;state.likes=state.likes.includes(id)?state.likes.filter(x=>x!==id):[...state.likes,id];save();renderFeed()});
   $$("[data-share]").forEach(b=>b.onclick=()=>{const p=list.find(x=>x.id===b.dataset.share);copy(p.text)});
+  $$("[data-follow]").forEach(b=>b.onclick=()=>{const id=b.dataset.follow;const f=state.following||[];state.following=f.includes(id)?f.filter(x=>x!==id):[...f,id];save();renderFeed();toast(state.following.includes(id)?"Following ✓":"Unfollowed")});
+  $$("[data-play]").forEach(b=>b.onclick=()=>toast("Demo video — real playback needs the video upload backend"));
 }
 $("#newPost").onclick=()=>$("#postDialog").showModal();
 $("#cancelPost").onclick=()=>$("#postDialog").close();
@@ -241,7 +250,7 @@ function renderLibrary(){
 function renderMonetize(){
   $("#inFollowers").value=state.followers||"";$("#inViews").value=state.views||"";
   $("#chkOriginal").checked=state.original;$("#chkGuidelines").checked=state.guidelines;
-  drawReqs();
+  drawReqs();renderRewards();
 }
 function drawReqs(){
   const f=state.followers,v=state.views;
@@ -255,6 +264,7 @@ function drawReqs(){
   const all=rows.every(r=>r.ok),box=$("#eligibleBox");
   box.className="eligible"+(all?" yes":"");
   box.textContent=all?"♛ You meet the target requirements. Real payouts will open when the platform launches.":"Keep creating. Meet all four requirements to become eligible.";
+  renderRewards();
 }
 $("#inFollowers").oninput=e=>{state.followers=Math.max(0,parseInt(e.target.value)||0);save();drawReqs()};
 $("#inViews").oninput=e=>{state.views=Math.max(0,parseInt(e.target.value)||0);save();drawReqs()};
@@ -273,6 +283,68 @@ $("#planFreeBtn").onclick=()=>{state.plan="free";save();renderPlans();renderProf
 $("#choosePro").onclick=()=>{state.plan="pro";save();renderPlans();renderProfile();toast("Pro selected — payment coming soon")};
 $("#choosePrem").onclick=()=>{state.plan="premium";save();renderPlans();renderProfile();toast("Premium selected — payment coming soon")};
 renderPlans();
+
+/* settings */
+function renderSettings(){
+  const s=state.settings||def.settings;
+  const p=state.profile||{name:"Creator",username:"creator"};
+  $("#setAccount").textContent="Signed in as "+(p.name||"Creator")+" (@"+(p.username||"creator")+") · Plan: "+(PLANS[state.plan||"free"].name);
+  $("#setPublic").checked=!!s.publicProfile;$("#setComments").checked=!!s.allowComments;
+  $("#setDownloads").checked=!!s.allowDownloads;$("#setShowVideos").checked=!!s.showVideos;
+  $("#setNotifFollowers").checked=!!s.notifFollowers;$("#setNotifLikes").checked=!!s.notifLikes;
+  $("#setNotifRewards").checked=!!s.notifRewards;$("#setNotifMessages").checked=!!s.notifMessages;
+  $("#setAutoplay").checked=!!s.autoplay;$("#setLang").value=s.lang||"Roman Urdu";
+  $("#setStorage").textContent="Saved drafts: "+state.saved.length+" · Posts: "+state.posts.length+" · Likes: "+state.likes.length;
+}
+[["#setPublic","publicProfile"],["#setComments","allowComments"],["#setDownloads","allowDownloads"],["#setShowVideos","showVideos"],["#setNotifFollowers","notifFollowers"],["#setNotifLikes","notifLikes"],["#setNotifRewards","notifRewards"],["#setNotifMessages","notifMessages"],["#setAutoplay","autoplay"]].forEach(([id,key])=>{$(id).onchange=e=>{if(!state.settings)state.settings={...def.settings};state.settings[key]=e.target.checked;save();toast("Setting saved")}});
+$("#setLang").onchange=e=>{if(!state.settings)state.settings={...def.settings};state.settings.lang=e.target.value;save();toast("Language: "+e.target.value)};
+$("#setEditProfile").onclick=()=>{go("creator");$("#editProfile").click()};
+$("#clearData").onclick=()=>{if(confirm("Clear all CreateWorld data in this browser?")){localStorage.removeItem(KEY);location.reload()}};
+
+/* creator rewards program */
+function calcRewards(){
+  const v=Math.max(0,parseInt($("#rwViews").value)||0);
+  $("#rwResult").textContent="Estimated reward: Rs "+fmt(Math.floor(v/10000*50))+" (demo rate: Rs 50 per 10,000 views)";
+}
+function renderRewards(){
+  $("#joinRewards").textContent=state.rewardsJoined?"✓ Joined Rewards Program (demo)":"Join Rewards Program";
+  const ok=state.followers>=1000&&state.views>=50000&&state.original&&state.guidelines;
+  $("#rwStatus").textContent=state.rewardsJoined?(ok?"Eligible ✓ — rewards demo rate par count honge.":"Joined — pehle 4 requirements poori karo (upar dekho)."):"Join karo — phir views par reward count hoga (demo rate).";
+  calcRewards();
+}
+$("#rwViews").oninput=calcRewards;
+$("#joinRewards").onclick=()=>{state.rewardsJoined=!state.rewardsJoined;save();renderRewards();toast(state.rewardsJoined?"Rewards Program joined (demo)":"Rewards Program left")};
+
+/* inbox */
+const SEED_THREADS=[
+  {id:"t1",name:"Ayesha Creates",msgs:[{f:"them",t:"Salam! Aapki video ka idea bohot acha tha.",time:"9:12"},{f:"me",t:"Shukriya! Agli video kal aayegi.",time:"9:20"}]},
+  {id:"t2",name:"Bilal Edits",msgs:[{f:"them",t:"Thumbnail wali tips try ki, views barh gaye!",time:"Yesterday"}]},
+  {id:"t3",name:"CreateWorld Team",msgs:[{f:"them",t:"Welcome! Rewards Program jald aa raha hai.",time:"Mon"}]}
+];
+function getThreads(){if(!state.inbox)state.inbox={threads:SEED_THREADS};return state.inbox.threads}
+let openThread=null;
+function renderInbox(){
+  openThread=null;
+  $("#inboxList").classList.remove("hidden");$("#threadView").classList.add("hidden");
+  const list=getThreads();
+  $("#inboxList").innerHTML=list.map(t=>{const last=t.msgs[t.msgs.length-1];return `<div class="inbox-item" data-thread="${t.id}"><div class="ico">${esc(t.name[0])}</div><div><b>${esc(t.name)}</b><small>${esc(last.time)}</small><p>${esc(last.t)}</p></div></div>`}).join("");
+  $$("[data-thread]").forEach(el=>el.onclick=()=>openThreadFn(el.dataset.thread));
+}
+function openThreadFn(id){
+  openThread=id;
+  const t=getThreads().find(x=>x.id===id); if(!t)return;
+  $("#inboxList").classList.add("hidden");
+  $("#threadView").classList.remove("hidden");
+  $("#threadName").textContent=t.name;
+  $("#threadMsgs").innerHTML=t.msgs.map(m=>`<div class="msg ${m.f==="me"?"me":"them"}">${esc(m.t)}<small>${esc(m.time||"")}</small></div>`).join("");
+}
+$("#backInbox").onclick=()=>{openThread=null;$("#inboxList").classList.remove("hidden");$("#threadView").classList.add("hidden")};
+$("#sendMsg").onclick=()=>{
+  const v=$("#threadInput").value.trim(); if(!v||!openThread)return;
+  const t=getThreads().find(x=>x.id===openThread); if(!t)return;
+  t.msgs.push({f:"me",t:v,time:"now"}); save();
+  $("#threadInput").value=""; openThreadFn(openThread);
+};
 
 renderProfile();renderFeed();
 if("serviceWorker" in navigator&&location.protocol.startsWith("http"))addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
