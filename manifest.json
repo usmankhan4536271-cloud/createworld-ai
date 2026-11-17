@@ -1,0 +1,14 @@
+{
+  "name": "CreateWorld AI",
+  "short_name": "CreateWorld",
+  "description": "Create, Share, Grow, Earn. The AI video creator and social platform.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "icons": [
+    {"src": "img/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"}
+  ]
+}

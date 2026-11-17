@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#050505">
+<meta name="description" content="CreateWorld AI — Create, Share, Grow, Earn. The AI video creator and social platform for creators.">
+<title>CreateWorld AI — Your World of Creativity</title>
+<link rel="icon" href="img/favicon.png">
+<link rel="apple-touch-icon" href="img/icon-192.png">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="#" data-view="home"><img src="img/logo.png" alt="CreateWorld AI logo"><span>CreateWorld <b>AI</b></span></a>
+  <nav class="nav" id="nav">
+    <button data-view="home" class="active">Home</button>
+    <button data-view="studio">AI Studio</button>
+    <button data-view="explore">Explore</button>
+    <button data-view="creator">Creator</button>
+    <button data-view="monetize">Monetization</button>
+    <button data-view="plans">Plans</button>
+  </nav>
+  <button class="avatar" data-view="creator" id="avatarBtn" aria-label="Profile">U</button>
+</header>
+
+<main>
+
+<!-- HOME -->
+<section class="view active" id="view-home">
+  <div class="hero">
+    <div class="hero-copy">
+      <img class="hero-logo" src="img/logo.png" alt="">
+      <h1>CreateWorld <span class="gold">AI</span></h1>
+      <p class="tag">Create <i>•</i> Share <i>•</i> Grow <i>•</i> Earn</p>
+      <p class="sub">The Ultimate AI Video Creator &amp; Social Platform</p>
+      <div class="actions">
+        <button class="gold-btn" data-view="studio">Start Creating →</button>
+        <button class="ghost-btn" data-view="explore">▶ Watch Demo</button>
+      </div>
+    </div>
+    <div class="hero-art">
+      <div class="scene"><div class="sun"></div><div class="mount m1"></div><div class="mount m2"></div><div class="figure">✦</div></div>
+      <div class="quote">Dream Big…<br>Create More…</div>
+      <div class="stat-card"><div><b>1,000</b><small>Followers</small></div><div><b>50,000</b><small>Views</small></div><span>♛ Monetize Your Channel</span></div>
+    </div>
+  </div>
+
+  <div class="features">
+    <button data-view="studio"><span>AI</span>Video Generator</button>
+    <button data-view="studio"><span>▣</span>Image Generator</button>
+    <button data-view="studio"><span>🎙</span>Voice Generator</button>
+    <button data-view="studio"><span>✂</span>Video Editor</button>
+    <button data-view="explore"><span>👥</span>Social Network</button>
+    <button data-view="monetize"><span>🎁</span>Earn Rewards</button>
+  </div>
+
+  <div class="section-title"><h2>See the platform</h2><p>Concept screens of the CreateWorld AI app</p></div>
+  <div class="showcase"><img src="img/showcase.jpg" alt="CreateWorld AI app screens: feed, AI studio, profile and monetization"></div>
+  <div class="showcase small"><img src="img/poster.jpg" alt="CreateWorld AI feature poster"></div>
+
+  <div class="store-row">
+    <span class="store">▶ Google Play <small>Coming soon</small></span>
+    <span class="store">&#63743; App Store <small>Coming soon</small></span>
+  </div>
+  <p class="notice">Concept screens and demo numbers on this site are for preview only. The app is not live in the stores yet.</p>
+</section>
+
+<!-- STUDIO -->
+<section class="view" id="view-studio">
+  <div class="section-title"><h2>AI Creation Studio <em class="pro">PRO</em></h2><p>Turn your ideas into stunning videos. These tools write ready-to-use drafts; paste them into your video generator.</p></div>
+  <div class="tabs">
+    <button class="tab active" data-tool="prompt">Video Prompt</button>
+    <button class="tab" data-tool="voice">Voiceover</button>
+    <button class="tab" data-tool="plan">Content Plan</button>
+  </div>
+
+  <div class="panel" id="promptTool">
+    <label>Enter your prompt <span class="muted">(<span id="count">0</span>/500)</span></label>
+    <textarea id="idea" maxlength="500" placeholder="A boy and his golden dog watching sunset from a mountain…"></textarea>
+    <div class="chips" id="styleChips">
+      <button class="chip active">Trending</button><button class="chip">Anime</button><button class="chip">Cartoon</button><button class="chip">Realistic</button>
+    </div>
+    <div class="row">
+      <select id="ratio"><option>9:16 vertical</option><option>16:9 landscape</option><option>1:1 square</option></select>
+      <select id="lang"><option>English</option><option>Urdu</option><option>Roman Urdu</option></select>
+    </div>
+    <button class="gold-btn wide" id="makePrompt">Generate ✦</button>
+    <div class="output hidden" id="promptOutput"><pre id="promptResult"></pre><div class="out-actions"><button class="text-btn" data-copy="promptResult">Copy</button></div></div>
+  </div>
+
+  <div class="panel hidden" id="voiceTool">
+    <label>Voiceover topic</label>
+    <input id="voiceTopic" placeholder="e.g. Why discipline beats motivation">
+    <div class="row">
+      <select id="voiceTone"><option>Inspiring</option><option>Calm</option><option>Energetic</option><option>Storytelling</option></select>
+      <select id="voiceLength"><option>15 seconds</option><option>30 seconds</option><option>60 seconds</option></select>
+    </div>
+    <button class="gold-btn wide" id="makeVoice">Write script ✦</button>
+    <div class="output hidden" id="voiceOutput"><pre id="voiceResult"></pre><div class="out-actions"><button class="text-btn" data-copy="voiceResult">Copy</button></div></div>
+  </div>
+
+  <div class="panel hidden" id="planTool">
+    <label>Content idea</label>
+    <input id="planTopic" placeholder="e.g. 7-day short video series on productivity">
+    <button class="gold-btn wide" id="makePlan">Build plan ✦</button>
+    <div class="output hidden" id="planOutput"><pre id="planResult"></pre><div class="out-actions"><button class="text-btn" data-copy="planResult">Copy</button></div></div>
+  </div>
+</section>
+
+<!-- EXPLORE -->
+<section class="view" id="view-explore">
+  <div class="section-title row-title"><div><h2>Explore</h2><p>Trending ideas and your own posts (saved in this browser only).</p></div><button class="gold-btn" id="newPost">＋ New post</button></div>
+  <div class="tabs"><button class="tab active" data-feed="foryou">For You</button><button class="tab" data-feed="following">Following</button><button class="tab" data-feed="trending">Trending</button></div>
+  <div id="feed"></div>
+</section>
+
+<!-- CREATOR -->
+<section class="view" id="view-creator">
+  <div class="profile-card">
+    <div class="pfp" id="pfp">U</div>
+    <h2><span id="pname">Creator</span> <span class="crown">♛</span></h2>
+    <p class="muted" id="phandle">@creator</p>
+    <div class="stats3">
+      <div><b id="sViews">0</b><small>Views</small></div>
+      <div><b id="sFollowers">0</b><small>Followers</small></div>
+      <div><b id="sDrafts">0</b><small>Saved drafts</small></div>
+    </div>
+    <button class="gold-btn" id="editProfile">Edit Profile</button>
+    <p class="bio">Create • Share • Grow • Earn<br>Dream Big… ✦</p>
+  </div>
+  <div class="section-title"><h2>My Library</h2><p>Your saved prompts, scripts and plans.</p></div>
+  <div id="library" class="library"></div>
+</section>
+
+<!-- MONETIZE -->
+<section class="view" id="view-monetize">
+  <div class="section-title"><h2>Monetization</h2><p>Check how close you are to the creator requirements. Enter your real numbers below.</p></div>
+  <div class="panel">
+    <div class="row">
+      <div><label>Followers</label><input type="number" min="0" id="inFollowers" placeholder="0"></div>
+      <div><label>Views (last 30 days)</label><input type="number" min="0" id="inViews" placeholder="0"></div>
+    </div>
+    <label class="check"><input type="checkbox" id="chkOriginal"> My content is original</label>
+    <label class="check"><input type="checkbox" id="chkGuidelines"> I follow the community guidelines</label>
+  </div>
+  <div class="panel" id="reqList"></div>
+  <div class="eligible" id="eligibleBox"></div>
+  <p class="notice">This checker only compares your numbers with the target requirements (1,000 followers, 50,000 views in 30 days). Real payouts need a backend, verified accounts and a payment provider, which are not part of this website yet.</p>
+</section>
+
+<!-- PLANS -->
+<section class="view" id="view-plans">
+  <div class="section-title"><h2>Plans</h2><p>Planned membership tiers. Payments are not enabled yet.</p></div>
+  <div class="plans">
+    <article class="plan"><h3>Free</h3><p class="price">$0</p><ul><li>Prompt, voiceover and plan tools</li><li>Local library</li><li>Community feed</li></ul><button class="ghost-btn wide" disabled>Current</button></article>
+    <article class="plan featured"><span class="badge">PRO</span><h3>Pro</h3><p class="price">Soon</p><ul><li>Higher generation limits</li><li>HD export</li><li>Creator analytics</li></ul><button class="gold-btn wide" id="waitPro">Join waitlist</button></article>
+    <article class="plan"><span class="badge">♛</span><h3>Premium</h3><p class="price">Soon</p><ul><li>Everything in Pro</li><li>Priority queue</li><li>Monetization tools</li></ul><button class="ghost-btn wide" id="waitPrem">Join waitlist</button></article>
+  </div>
+</section>
+
+</main>
+
+<nav class="bottom" id="bottom">
+  <button data-view="home" class="active"><span>⌂</span>Home</button>
+  <button data-view="explore"><span>◎</span>Explore</button>
+  <button class="plus" data-view="studio">＋</button>
+  <button data-view="monetize"><span>$</span>Earn</button>
+  <button data-view="creator"><span>◉</span>Profile</button>
+</nav>
+
+<dialog id="postDialog">
+  <h3>New post</h3>
+  <textarea id="postText" maxlength="280" placeholder="Share an idea with the community…"></textarea>
+  <div class="dialog-actions"><button class="ghost-btn" id="cancelPost">Cancel</button><button class="gold-btn" id="publishPost">Post</button></div>
+</dialog>
+<div id="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
