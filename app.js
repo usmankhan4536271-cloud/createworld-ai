@@ -1,7 +1,7 @@
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const KEY="createworld-ai-v2";
-const def={name:"Creator",profile:null,hasProfile:false,saved:[],posts:[],likes:[],followers:0,views:0,original:false,guidelines:false};
+const def={name:"Creator",profile:null,hasProfile:false,plan:"free",videosUsed:0,saved:[],posts:[],likes:[],followers:0,views:0,original:false,guidelines:false};
 let state;
 try{state={...def,...JSON.parse(localStorage.getItem(KEY)||"{}")}}catch(e){state={...def}}
 if(!state.profile)state.profile={name:state.name||"Creator",username:(state.name||"creator").toLowerCase().replace(/[^a-z0-9]+/g,""),bio:"Create • Share • Grow • Earn",niche:"General"};
@@ -202,6 +202,8 @@ function renderProfile(){
   $("#phandle").textContent="@"+(p.username||"creator");
   $("#pbio").textContent=p.bio||"Create • Share • Grow • Earn";
   $("#pniche").textContent=p.niche?("Niche: "+p.niche):"";
+  const pl=PLANS[state.plan||"free"]||PLANS.free;
+  $("#pquota").textContent="Plan: "+pl.name+" · Videos this month: "+(state.videosUsed||0)+" / "+pl.videos;
   $("#editProfile").textContent=state.hasProfile?"Edit Profile":"Create Account";
   $("#sViews").textContent=fmt(state.views);$("#sFollowers").textContent=fmt(state.followers);$("#sDrafts").textContent=state.saved.length;
 }
@@ -255,7 +257,17 @@ $("#chkOriginal").onchange=e=>{state.original=e.target.checked;save();drawReqs()
 $("#chkGuidelines").onchange=e=>{state.guidelines=e.target.checked;save();drawReqs()};
 
 /* plans */
-["#waitPro","#waitPrem"].forEach(id=>$(id).onclick=()=>toast("Waitlist is not connected yet. Coming soon."));
+const PLANS={free:{name:"Free",videos:1},pro:{name:"Pro",videos:6},premium:{name:"Premium",videos:14}};
+function renderPlans(){
+  const p=state.plan||"free";
+  $("#planFreeBtn").textContent=p==="free"?"Current plan":"Choose Free";
+  $("#choosePro").textContent=p==="pro"?"Current plan":"Choose Pro";
+  $("#choosePrem").textContent=p==="premium"?"Current plan":"Choose Premium";
+}
+$("#planFreeBtn").onclick=()=>{state.plan="free";save();renderPlans();renderProfile();toast("Free plan selected")};
+$("#choosePro").onclick=()=>{state.plan="pro";save();renderPlans();renderProfile();toast("Pro selected — payment coming soon")};
+$("#choosePrem").onclick=()=>{state.plan="premium";save();renderPlans();renderProfile();toast("Premium selected — payment coming soon")};
+renderPlans();
 
 renderProfile();renderFeed();
 if("serviceWorker" in navigator&&location.protocol.startsWith("http"))addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
