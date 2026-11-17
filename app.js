@@ -1,7 +1,7 @@
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const KEY="createworld-ai-v2";
-const def={name:"Creator",profile:null,hasProfile:false,plan:"free",videosUsed:0,saved:[],posts:[],likes:[],followers:0,views:0,original:false,guidelines:false};
+const def={name:"Creator",profile:null,hasProfile:false,plan:"free",videosUsed:0,earnings:0,saved:[],posts:[],likes:[],followers:0,views:0,original:false,guidelines:false};
 let state;
 try{state={...def,...JSON.parse(localStorage.getItem(KEY)||"{}")}}catch(e){state={...def}}
 if(!state.profile)state.profile={name:state.name||"Creator",username:(state.name||"creator").toLowerCase().replace(/[^a-z0-9]+/g,""),bio:"Create • Share • Grow • Earn",niche:"General"};
@@ -204,6 +204,11 @@ function renderProfile(){
   $("#pniche").textContent=p.niche?("Niche: "+p.niche):"";
   const pl=PLANS[state.plan||"free"]||PLANS.free;
   $("#pquota").textContent="Plan: "+pl.name+" · Videos this month: "+(state.videosUsed||0)+" / "+pl.videos;
+  const planPrice=pl.name==="Free"?"Rs 0":pl.name==="Pro"?"Rs 999/mo":"Rs 1,999/mo";
+  $("#earnPlan").textContent="Plan: "+pl.name+" ("+planPrice+")";
+  $("#earnVideos").textContent="Videos this month: "+(state.videosUsed||0)+" / "+pl.videos;
+  $("#earnMoney").textContent="Kamai: Rs "+(state.earnings||0)+" (demo)";
+  $("#earnGoals").textContent="Monetization goal: "+state.followers+" / 1,000 followers · "+state.views+" / 50,000 views";
   $("#editProfile").textContent=state.hasProfile?"Edit Profile":"Create Account";
   $("#sViews").textContent=fmt(state.views);$("#sFollowers").textContent=fmt(state.followers);$("#sDrafts").textContent=state.saved.length;
 }
